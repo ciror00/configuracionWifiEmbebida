@@ -1,3 +1,5 @@
+import os
+import machine
 import time
 import network
 import socket
@@ -41,9 +43,36 @@ class Connectivity:
         self.sta_if = network.WLAN(network.STA_IF)
         time.sleep(1)
 
-    def wifi(self):
-        ssid = str(self.network_wifi)
-        pasw = str(self.password_wifi)
+    def update(self):
+        try:
+            os.remove("network.txt")
+            print("network.txt eliminado")
+        except:
+            print("No existe network.txt o no se puedo eliminar")
+        file = open("network.txt", "w")
+        file.write(self.network_wifi)
+        file.write("\n")
+        file.write(self.password_wifi)
+        file.close()
+
+    def backup(self):
+        try:
+            file = open("network.txt", "r")
+            read = file.readlines()
+            print(read)
+            self.network_wifi = read[0]
+            self.password_wifi = read[1]
+            return True
+        except:
+            return False
+
+    def wifi(self, ssid_flash=0, password_flash=0):
+        if (ssid_flash == 0):
+            ssid = str(self.network_wifi)
+            pasw = str(self.password_wifi)
+        else:
+            ssid = str(ssid_flash)
+            pasw = str(password_flash)
         print('Iniciando conexion Wifi en la red %s', ssid)
         # time = 60
         self.ap_if.active(False)
@@ -55,9 +84,9 @@ class Connectivity:
                 self.sta_if.connect(ssid, pasw)
                 while not self.sta_if.isconnected():
                     pass
-            print('Wifi conectado:', self.sta_if.ifconfig())
+            print('Network config:', self.sta_if.ifconfig())
         else:
-            print('No se encontró red configurada.')
+            print('No se encontro RED configurada.')
 
     def server(self):
         self.sta_if.active(False)
@@ -68,15 +97,16 @@ class Connectivity:
         s = socket.socket()
         s.bind(addr)
         s.listen(1)
-        print('Servidor iniciado, en la red ', addr)
+
+        print('listening on', addr)
 
         while True:
             conn, addr = s.accept()
-            print('Conexion desde la IP %s' % str(addr))
+            print('Client connected from %s' % str(addr))
             time.sleep(1)
             request = conn.recv(1024)
             request = str(request)
-            #print(str(request, 'utf8'), end='')
+            # print(str(request, 'utf8'), end='')
             time.sleep(1)
             ssid_position = request.find('/?ssid=')
             pasw_position = request.find('&pasw=')
@@ -85,6 +115,8 @@ class Connectivity:
                 self.network_wifi = str(request[ssid_position * 2 + 1:pasw_position])
                 self.password_wifi = str(request[pasw_position + 6:cut_position - 1])
                 print('\n')
+                # print('SSID = %s' % self.network_wifi)
+                # print('PASSWORD = %s' % self.password_wifi)
                 conn.send('HTTP/1.1 200 OK\n')
                 conn.send('Content-Type: text/html\n')
                 conn.send('Connection: close\n\n')
@@ -96,4 +128,4 @@ class Connectivity:
             conn.send('Connection: close\n\n')
             conn.sendall(response)
             conn.close()
-        print('Wifi configurado')
+        print('Se cargaron datos de red para conexion Wifi')
