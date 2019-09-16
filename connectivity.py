@@ -9,7 +9,7 @@ def web_page():
     html = """<!DOCTYPE html>
   <html>
 	<head>
-		<title>Niemongoi</title>
+		<title>Pyrague</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="icon" href="data:,">
 		<style>html{font-family: Arial; display:inline-block; margin: 0px auto; text-align: center;}
@@ -33,7 +33,7 @@ def web_page():
 class Connectivity:
     def __init__(self):
         # Configuracion de AP
-        self.ap_ssid = "Servidor NMCU"
+        self.ap_ssid = "Pyrague"
         self.ap_password = "123456789"
         self.ap_if = network.WLAN(network.AP_IF)
         time.sleep(1)
