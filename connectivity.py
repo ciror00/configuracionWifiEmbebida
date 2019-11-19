@@ -33,7 +33,7 @@ def web_page():
 class Connectivity:
     def __init__(self):
         # Configuracion de AP
-        self.ap_ssid = "Pyrague"
+        self.ap_ssid = "KIT"
         self.ap_password = "123456789"
         self.ap_if = network.WLAN(network.AP_IF)
         time.sleep(1)
